@@ -58,8 +58,7 @@ export default function (vis, resp) {
     }
 
     // iterate through all the buckets
-    //_.each(extractBuckets(data[agg.id], agg), function (bucket) {
-	_.each(extractBuckets(data[agg.id] || data['nested_' + agg.id][agg.id]), function (bucket) {
+	_.each(extractBuckets(data[agg.id] || data['special_' + agg.id][agg.id]), function (bucket) {
 	
       let _record = _.flattenDeep([record, bucket.key]);
       _.each(metrics, function (metric) {
@@ -75,7 +74,7 @@ export default function (vis, resp) {
       // This is where the recursion happens.
       if (agg._next) {
         //let nextBucket = bucket[agg._next.id];
-		let nextBucket = bucket[agg._next.id] || bucket['nested_' + agg._next.id][agg._next.id];
+		let nextBucket = bucket[agg._next.id] || bucket['special_' + agg._next.id][agg._next.id];
         if (nextBucket && nextBucket.buckets) {
           walkBuckets(agg._next, bucket, _record);
         }

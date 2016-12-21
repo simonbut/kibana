@@ -34,7 +34,6 @@ export default function FiltersAggDefinition(Private, Notifier) {
 			}
             if (!query) return notif.log('malformed filter agg params, missing "query" on input');
 
-            //decorateQuery(query);
 
             let label = filter.label || _.get(query, 'query_string.query') || angular.toJson(query);
             filters[label] = input;

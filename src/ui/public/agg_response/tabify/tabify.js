@@ -36,8 +36,8 @@ export default function tabifyAggResponseProvider(Private, Notifier) {
     switch (agg.schema.group) {
       case 'buckets':
         let buckets = new Buckets(bucket[agg.id]);
-        if (bucket['nested_' + agg.id] !== undefined) {
-          buckets = new Buckets(bucket['nested_' + agg.id][agg.id]);
+        if (bucket['special_' + agg.id] !== undefined) {
+          buckets = new Buckets(bucket['special_' + agg.id][agg.id]);
         }
         if (buckets.length) {
           let splitting = write.canSplit && agg.schema.name === 'split';

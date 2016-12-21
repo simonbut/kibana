@@ -98,40 +98,6 @@ export default function AggConfigsFactory(Private) {
       return !config.type.hasNoDsl;
     })
     .forEach(function nestEachConfig(config, i, list) {
-      /* if (!dslLvlCursor) {
-        // start at the top level
-        dslLvlCursor = dslTopLvl;
-      } else {
-        let prevConfig = list[i - 1];
-        let prevDsl;
-		switch(prevConfig.type.name){
-			case "tradeinnested":
-			case "children":
-			prevDsl = dslLvlCursor['nested_' + prevConfig.id];
-			break;
-			case "samelayer":
-			default:
-			prevDsl = dslLvlCursor[prevConfig.id];
-			break;
-		}
-        // advance the cursor and nest under the previous agg, or
-        // put it on the same level if the previous agg doesn't accept
-        // sub aggs
-        dslLvlCursor = prevDsl.aggs || dslLvlCursor;
-      } */
-	  
-        /* let prevConfig = list[i - 1];
-        let prevDsl;
-		switch(prevConfig.type.name){
-			case "tradeinnested":
-			case "children":
-			prevDsl = dslLvlCursor['nested_' + prevConfig.id];
-			break;
-			case "samelayer":
-			default:
-			prevDsl = dslLvlCursor[prevConfig.id];
-			break;
-		} */
 
       let dsl;
       let subAggs;
@@ -190,7 +156,7 @@ export default function AggConfigsFactory(Private) {
 				},
 				aggs: aggsb
 			  };
-			  dslLvlCursor['nested_' + config.id]=dsl;
+			  dslLvlCursor['special_' + config.id]=dsl;
 			  config.type="nested";
 			break;
 			case "children":
@@ -205,7 +171,7 @@ export default function AggConfigsFactory(Private) {
 				},
 				aggs: aggsb
 			  };
-			  dslLvlCursor['nested_' + config.id]=dsl;
+			  dslLvlCursor['special_' + config.id]=dsl;
 			  config.type="children";
 			break;
 			case "reversenested":
@@ -217,7 +183,7 @@ export default function AggConfigsFactory(Private) {
                 reverse_nested: {},
 				aggs: aggsb
 			  };
-			  dslLvlCursor['nested_' + config.id]=dsl;
+			  dslLvlCursor['special_' + config.id]=dsl;
 			  config.type="reversenested";
 			break;
 			default:
@@ -236,7 +202,7 @@ export default function AggConfigsFactory(Private) {
       if (subAggs && nestedMetrics) {
         nestedMetrics.forEach(function (agg) {
           subAggs[agg.config.id] = agg.dsl;
-          subAggs['nested_' + agg.config.id] = agg.config.todsl();
+          subAggs['special_' + agg.config.id] = agg.config.todsl();
         });
       }
 	  
