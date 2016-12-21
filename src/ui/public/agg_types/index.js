@@ -19,6 +19,9 @@ import AggTypesBucketsTermsProvider from 'ui/agg_types/buckets/terms';
 import AggTypesBucketsFiltersProvider from 'ui/agg_types/buckets/filters';
 import AggTypesBucketsSignificantTermsProvider from 'ui/agg_types/buckets/significant_terms';
 import AggTypesBucketsGeoHashProvider from 'ui/agg_types/buckets/geo_hash';
+import AggTypesBucketstradeinnestedProvider from 'ui/agg_types/buckets/nested';
+import AggTypesBucketschildrenProvider from 'ui/agg_types/buckets/children';
+import AggTypesBucketssamelayerProvider from 'ui/agg_types/buckets/reversenested';
 export default function AggTypeService(Private) {
 
   let aggs = {
@@ -43,7 +46,10 @@ export default function AggTypeService(Private) {
       Private(AggTypesBucketsTermsProvider),
       Private(AggTypesBucketsFiltersProvider),
       Private(AggTypesBucketsSignificantTermsProvider),
-      Private(AggTypesBucketsGeoHashProvider)
+      Private(AggTypesBucketsGeoHashProvider),
+      Private(AggTypesBucketstradeinnestedProvider),
+      Private(AggTypesBucketschildrenProvider),
+      Private(AggTypesBucketssamelayerProvider)
     ]
   };
 

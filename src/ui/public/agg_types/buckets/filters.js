@@ -12,7 +12,7 @@ export default function FiltersAggDefinition(Private, Notifier) {
 
   return new BucketAggType({
     name: 'filters',
-    title: 'Filters',
+    title: 'filters',
     createFilter: createFilter,
     customLabels: false,
     params: [
@@ -29,9 +29,12 @@ export default function FiltersAggDefinition(Private, Notifier) {
             if (!input) return notif.log('malformed filter agg params, missing "input" query');
 
             let query = input.query;
+			if(input.custquery){
+				query = input.custquery;
+			}
             if (!query) return notif.log('malformed filter agg params, missing "query" on input');
 
-            decorateQuery(query);
+            //decorateQuery(query);
 
             let label = filter.label || _.get(query, 'query_string.query') || angular.toJson(query);
             filters[label] = input;

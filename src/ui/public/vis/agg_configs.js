@@ -75,7 +75,7 @@ export default function AggConfigsFactory(Private) {
 
   AggConfigs.prototype.toDsl = function () {
     let dslTopLvl = {};
-    let dslLvlCursor;
+    let dslLvlCursor = dslTopLvl;//////
     let nestedMetrics;
 
     if (this.vis.isHierarchical()) {
@@ -98,32 +98,153 @@ export default function AggConfigsFactory(Private) {
       return !config.type.hasNoDsl;
     })
     .forEach(function nestEachConfig(config, i, list) {
-      if (!dslLvlCursor) {
+      /* if (!dslLvlCursor) {
         // start at the top level
         dslLvlCursor = dslTopLvl;
       } else {
         let prevConfig = list[i - 1];
-        let prevDsl = dslLvlCursor[prevConfig.id];
-
+        let prevDsl;
+		switch(prevConfig.type.name){
+			case "tradeinnested":
+			case "children":
+			prevDsl = dslLvlCursor['nested_' + prevConfig.id];
+			break;
+			case "samelayer":
+			default:
+			prevDsl = dslLvlCursor[prevConfig.id];
+			break;
+		}
         // advance the cursor and nest under the previous agg, or
         // put it on the same level if the previous agg doesn't accept
         // sub aggs
         dslLvlCursor = prevDsl.aggs || dslLvlCursor;
-      }
+      } */
+	  
+        /* let prevConfig = list[i - 1];
+        let prevDsl;
+		switch(prevConfig.type.name){
+			case "tradeinnested":
+			case "children":
+			prevDsl = dslLvlCursor['nested_' + prevConfig.id];
+			break;
+			case "samelayer":
+			default:
+			prevDsl = dslLvlCursor[prevConfig.id];
+			break;
+		} */
 
-      let dsl = dslLvlCursor[config.id] = config.toDsl();
+      let dsl;
       let subAggs;
-
+	  let aggsb = {};
+	  let result;
+		
+		switch(config.type.name){
+			case "filters":
+			//if(!config.params.aggregationJson){
+				
+				
+			if(config.params.filters[0].input.custquery==""){
+				dsl = dslLvlCursor[config.id] = config.toDsl();
+			    result = dsl;
+			}else{
+			  dsl = config.toDsl();
+			  result = dsl;
+			  let dslstring='{"filters": {"filters": {"';
+			  for(let counteri=0;counteri<config.params.filters.length;counteri++){
+				  dslstring=dslstring.concat(config.params.filters[counteri].label,'":',config.params.filters[counteri].input.custquery);
+				  if(counteri<config.params.filters.length-1){
+					  dslstring=dslstring.concat(',"');
+				  }else{
+			        dslstring=dslstring.concat('}}}');
+				  }
+			  }
+			  dsl=JSON.parse(dslstring);
+			  
+			  dslLvlCursor[config.id]=dsl;
+			}
+				
+				
+				
+			  /* //let indexname='custfilter_' + config.id;
+			  let customfilter=config.params.filters[1].label;
+			  dsl = config.toDsl();
+			  result = dsl;
+			  //aggsb=JSON.parse(config.params.aggregationJson);
+			  let string1='{"filters": {"filters": {"';
+			  let dslstring=string1.concat(customfilter,'":',config.params.aggregationJson,'}}}');
+			  //+customfilter+':'+config.params.aggregationJson+'}}}}';
+			  dsl=JSON.parse(dslstring);
+			  
+			  dslLvlCursor[config.id]=dsl; */
+			//}
+			break;
+			case "nested":
+			  let nestedp=config.params.field.name.split('.')[0];
+			  config.type="terms";
+			  dsl = config.toDsl();
+			  result = dsl;
+			  aggsb[config.id] = dsl;
+			  dsl = {
+				nested: {
+				  path: nestedp
+				},
+				aggs: aggsb
+			  };
+			  dslLvlCursor['nested_' + config.id]=dsl;
+			  config.type="nested";
+			break;
+			case "children":
+			  let custtype=config.params.aggregationData;
+			  config.type="terms";
+			  dsl = config.toDsl();
+			  result = dsl;
+			  aggsb[config.id] = dsl;
+			  dsl = {
+				children: {
+					type : custtype
+				},
+				aggs: aggsb
+			  };
+			  dslLvlCursor['nested_' + config.id]=dsl;
+			  config.type="children";
+			break;
+			case "reversenested":
+			  config.type="terms";
+			  dsl = config.toDsl();
+			  result = dsl;
+			  aggsb[config.id] = dsl;
+			  dsl = {
+                reverse_nested: {},
+				aggs: aggsb
+			  };
+			  dslLvlCursor['nested_' + config.id]=dsl;
+			  config.type="reversenested";
+			break;
+			default:
+				dsl = dslLvlCursor[config.id] = config.toDsl();
+			    result = dsl;
+			break;
+			
+			
+		}
+		dsl=result;
+		
       if (config.schema.group === 'buckets' && i < list.length - 1) {
-        // buckets that are not the last item in the list accept sub-aggs
-        subAggs = dsl.aggs || (dsl.aggs = {});
+          subAggs = dsl.aggs || (dsl.aggs = {});
       }
 
       if (subAggs && nestedMetrics) {
         nestedMetrics.forEach(function (agg) {
           subAggs[agg.config.id] = agg.dsl;
+          subAggs['nested_' + agg.config.id] = agg.config.todsl();
         });
       }
+	  
+          // advance the cursor and nest under the previous agg, or
+          // put it on the same level if the previous agg doesn't accept
+          // sub aggs
+        dslLvlCursor = dsl.aggs || dslLvlCursor;
+
     });
 
     return dslTopLvl;
