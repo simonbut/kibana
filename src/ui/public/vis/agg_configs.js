@@ -105,10 +105,67 @@ export default function AggConfigsFactory(Private) {
 	  let result;
 		
 		switch(config.type.name){
+			case "terms":
+			case "range":
+			case "significant_terms":
+			if(config.params.aggregationData){
+				if(config.params.aggregationData==""){
+				    dsl = dslLvlCursor[config.id] = config.toDsl();
+				    result = dsl;
+				}else{
+				  dsl = config.toDsl();
+				  result = dsl;
+				  let tempconfigid=config.id;
+				  let nestedcounter=0;
+				  let spnestedp=config.params.field.name.split('.')[0];
+				  let spquery=config.params.aggregationData.split(',');
+				  for(let spcounter1=spquery.length-1;spcounter1>=0;spcounter1--){
+					  if(spquery[spcounter1]=="nested"){
+						  aggsb = {};
+						  aggsb[tempconfigid] = dsl;
+						  spnestedp=config.params.field.name.split('.')[nestedcounter];
+						  nestedcounter++;
+						  dsl = {
+							nested: {
+							  path: spnestedp
+							},
+							aggs: aggsb
+						  };
+						  tempconfigid='special_' + tempconfigid;
+					  }
+					  if(spquery[spcounter1]=="reversenested"){
+						  aggsb = {};
+						  aggsb[tempconfigid] = dsl;
+						  dsl = {
+							reversenested: {},
+							aggs: aggsb
+						  };
+						  tempconfigid='special_' + tempconfigid;
+					  }
+					  if(spquery[spcounter1].includes("child")){
+						  aggsb = {};
+						  let sptype=spquery[spcounter1].split(':')[1];
+						  aggsb[tempconfigid] = dsl;
+						  dsl = {
+							children: {
+								type : sptype
+							},
+							aggs: aggsb
+						  };
+						  tempconfigid='special_' + tempconfigid;
+					  }
+					
+				  }
+			  	  dslLvlCursor[tempconfigid]=dsl;
+				  
+				}
+			}else{
+			    dsl = dslLvlCursor[config.id] = config.toDsl();
+			    result = dsl;
+			}
+			break;
+			
 			case "filters":
-			//if(!config.params.aggregationJson){
-				
-				
 			if(config.params.filters[0].input.custquery==""){
 				dsl = dslLvlCursor[config.id] = config.toDsl();
 			    result = dsl;
@@ -128,22 +185,8 @@ export default function AggConfigsFactory(Private) {
 			  
 			  dslLvlCursor[config.id]=dsl;
 			}
-				
-				
-				
-			  /* //let indexname='custfilter_' + config.id;
-			  let customfilter=config.params.filters[1].label;
-			  dsl = config.toDsl();
-			  result = dsl;
-			  //aggsb=JSON.parse(config.params.aggregationJson);
-			  let string1='{"filters": {"filters": {"';
-			  let dslstring=string1.concat(customfilter,'":',config.params.aggregationJson,'}}}');
-			  //+customfilter+':'+config.params.aggregationJson+'}}}}';
-			  dsl=JSON.parse(dslstring);
-			  
-			  dslLvlCursor[config.id]=dsl; */
-			//}
 			break;
+			
 			case "nested":
 			  let nestedp=config.params.field.name.split('.')[0];
 			  config.type="terms";
@@ -159,6 +202,7 @@ export default function AggConfigsFactory(Private) {
 			  dslLvlCursor['special_' + config.id]=dsl;
 			  config.type="nested";
 			break;
+			
 			case "children":
 			  let custtype=config.params.aggregationData;
 			  config.type="terms";
@@ -180,7 +224,7 @@ export default function AggConfigsFactory(Private) {
 			  result = dsl;
 			  aggsb[config.id] = dsl;
 			  dsl = {
-                reverse_nested: {},
+                		reverse_nested: {},
 				aggs: aggsb
 			  };
 			  dslLvlCursor['special_' + config.id]=dsl;

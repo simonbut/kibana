@@ -39,6 +39,9 @@ export default function tabifyAggResponseProvider(Private, Notifier) {
         if (bucket['special_' + agg.id] !== undefined) {
           buckets = new Buckets(bucket['special_' + agg.id][agg.id]);
         }
+        if (bucket['special_special_' + agg.id] !== undefined) {
+          buckets = new Buckets(bucket['special_special_' + agg.id]['special_' + agg.id][agg.id]);
+        }
         if (buckets.length) {
           let splitting = write.canSplit && agg.schema.name === 'split';
           if (splitting) {

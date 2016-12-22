@@ -47,7 +47,7 @@ export default function AggTypeService(Private) {
       Private(AggTypesBucketsFiltersProvider),
       Private(AggTypesBucketsSignificantTermsProvider),
       Private(AggTypesBucketsGeoHashProvider),
-      Private(AggTypesBucketstradeinnestedProvider),
+      Private(AggTypesBucketsnestedProvider),
       Private(AggTypesBucketschildrenProvider),
       Private(AggTypesBucketssamelayerProvider)
     ]

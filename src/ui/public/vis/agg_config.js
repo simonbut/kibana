@@ -215,6 +215,7 @@ export default function AggConfigFactory(Private, fieldTypeFilter) {
       output.subAggs.forEach(function nestAdhocSubAggs(subAggConfig) {
         subDslLvl[subAggConfig.id] = subAggConfig.toDsl();
         subDslLvl['special_' + subAggConfig.id] = subAggConfig.toDsl();
+        subDslLvl['special_special_' + subAggConfig.id] = subAggConfig.toDsl();
       });
     }
 

@@ -28,8 +28,11 @@ export default function transformAggregationProvider(Private) {
       // transform it as well. This is where the recursion happens.
       if (agg._next) {
         let nextBucket = bucket[agg._next.id];
-		 if (bucket['special_' + agg._next.id] !== undefined) {
+		    if (bucket['special_' + agg._next.id] !== undefined) {
           nextBucket = bucket['special_' + agg._next.id][agg._next.id];
+        }
+        if (bucket['special_special_' + agg._next.id] !== undefined) {
+          nextBucket = bucket['special_special_' + agg._next.id]['special_' + agg._next.id][agg._next.id];
         }
         if (nextBucket && nextBucket.buckets) {
           branch.children = transformAggregation(agg._next, metric, nextBucket, branch);

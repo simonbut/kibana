@@ -58,7 +58,7 @@ export default function (vis, resp) {
     }
 
     // iterate through all the buckets
-	_.each(extractBuckets(data[agg.id] || data['special_' + agg.id][agg.id]), function (bucket) {
+	_.each(extractBuckets(data[agg.id] || data['special_' + agg.id][agg.id] || data['special_special_' + agg.id][agg.id]), function (bucket) {
 	
       let _record = _.flattenDeep([record, bucket.key]);
       _.each(metrics, function (metric) {
