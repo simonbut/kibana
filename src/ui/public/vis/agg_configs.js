@@ -11,7 +11,7 @@ import _ from 'lodash';
 import IndexedArray from 'ui/indexed_array';
 import VisAggConfigProvider from 'ui/vis/agg_config';
 import AggTypesIndexProvider from 'ui/agg_types/index';
-export default function AggConfigsFactory(Private) {
+export default function AggConfigsFactory(Private,$injector) {
   let AggConfig = Private(VisAggConfigProvider);
 
   AggConfig.aggTypes = Private(AggTypesIndexProvider);
@@ -77,7 +77,7 @@ export default function AggConfigsFactory(Private) {
     let dslTopLvl = {};
     let dslLvlCursor = dslTopLvl;//////
     let nestedMetrics;
-
+	
     if (this.vis.isHierarchical()) {
       // collect all metrics, and filter out the ones that we won't be copying
       nestedMetrics = _(this.vis.aggs.bySchemaGroup.metrics)
@@ -103,7 +103,21 @@ export default function AggConfigsFactory(Private) {
       let subAggs;
 	  let aggsb = {};
 	  let result;
-		
+		let adconfig=$injector.get('config');
+		if('json' in config.params){
+			if('script' in JSON.parse(config.params.json)){
+				if('params' in JSON.parse(config.params.json).script){
+					for(let key in JSON.parse(config.params.json).script.params){
+						if(key in adconfig.getAll()){
+							let tempjson=JSON.parse(config.params.json);
+							tempjson.script.params[key]=adconfig.get(key);
+							config.params.json=JSON.stringify(tempjson);
+			
+						}
+					}
+				}
+			}
+		}
 		switch(config.type.name){
 			case "terms":
 			case "range":
@@ -234,8 +248,6 @@ export default function AggConfigsFactory(Private) {
 				dsl = dslLvlCursor[config.id] = config.toDsl();
 			    result = dsl;
 			break;
-			
-			
 		}
 		dsl=result;
 		

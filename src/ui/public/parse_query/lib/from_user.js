@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import DecorateQueryProvider from 'ui/courier/data_source/_decorate_query';
-export default function GetQueryFromUser(es, Private) {
+export default function GetQueryFromUser(es, Private,$injector) {
   let decorateQuery = Private(DecorateQueryProvider);
 
   /**
@@ -27,6 +27,19 @@ export default function GetQueryFromUser(es, Private) {
     // Nope, not an object.
     text = (text || '').trim();
     if (text.length === 0) return matchAll;
+
+	let adsetting=$injector.get('config');
+	let textsplit=text.toString().split(' ');
+	let textsplit2=[""];
+	let counter1=0;
+	for(counter1=0;counter1<textsplit.length;counter1++){
+		textsplit2[counter1]=textsplit[counter1].split(':');
+	}
+	for(counter1=0;counter1<textsplit.length;counter1++){
+		if(textsplit2[counter1].length>=2){
+				adsetting.set(textsplit2[counter1][0],textsplit2[counter1][1]);
+		}
+	}
 
     if (text[0] === '{') {
       try {
