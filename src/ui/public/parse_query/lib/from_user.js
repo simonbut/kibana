@@ -14,6 +14,12 @@ export default function GetQueryFromUser(es, Private,$injector) {
     }
 
     let matchAll = getQueryStringQuery('*');
+	
+	
+
+
+
+
 
     // If we get an empty object, treat it as a *
     if (_.isObject(text)) {
@@ -37,7 +43,7 @@ export default function GetQueryFromUser(es, Private,$injector) {
 	}
 	for(counter1=0;counter1<textsplit.length;counter1++){
 		if(textsplit2[counter1].length>=2){
-				adsetting.set(textsplit2[counter1][0],textsplit2[counter1][1]);
+				adsetting.set("params:"+textsplit2[counter1][0],textsplit2[counter1][1]);
 		}
 	}
 
