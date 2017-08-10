@@ -214,6 +214,8 @@ export default function AggConfigFactory(Private, fieldTypeFilter) {
       let subDslLvl = configDsl.aggs || (configDsl.aggs = {});
       output.subAggs.forEach(function nestAdhocSubAggs(subAggConfig) {
         subDslLvl[subAggConfig.id] = subAggConfig.toDsl();
+        subDslLvl['special_' + subAggConfig.id] = subAggConfig.toDsl();
+        subDslLvl['special_special_' + subAggConfig.id] = subAggConfig.toDsl();
       });
     }
 

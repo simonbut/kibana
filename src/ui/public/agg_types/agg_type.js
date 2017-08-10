@@ -106,7 +106,22 @@ export default function AggTypeFactory(Private) {
           write: _.noop
         });
       }
-
+      
+       if (config.aggregationData !== false) {
+        this.params.push({
+          name: 'aggregationData',
+          type: 'string',
+          write: _.noop
+        });
+      }  
+       /* if (config.aggregationJson !== false) {
+        this.params.push({
+          name: 'aggregationJson',
+          type: 'json',
+          write: _.noop
+        });
+      }  */ 
+	  
       this.params = new AggParams(this.params);
     }
 

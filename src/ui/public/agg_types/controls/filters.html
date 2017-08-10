@@ -40,6 +40,16 @@
         class="form-control"
         name="label{{$index}}">
     </div>
+	
+    <div class="form-group">
+    <label>customfilter {{$index + 1}}</label>
+    <input
+		ng-model="filter.input.custquery"
+		type="text"
+		class="form-control"
+		name="customfilter{{$index}}">
+    </div>
+	
   </div>
 </div>
 
